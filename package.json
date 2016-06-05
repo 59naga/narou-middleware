@@ -1,7 +1,7 @@
 {
   "name": "narou-middleware",
   "description": "a japanese novel sns syosetu.com unofficial scrape express4 middleware",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "main": "lib",
   "files": [
     "lib"
