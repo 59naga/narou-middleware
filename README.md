@@ -38,7 +38,7 @@ npm install express narou-middleware --save
   ```js
   // index.js
   import express from 'express';
-  import createNarouMiddleware from './src';
+  import createNarouMiddleware from 'narou-middleware';
 
   const app = express();
   app.set('json spaces', 2);
@@ -61,7 +61,7 @@ npm install express narou-middleware --save
 
 API
 ---
-* 一般小説検索API
+* 検索
   * `/`
   * `/?params`
   * `/word?params`
@@ -96,13 +96,13 @@ API
 
 API(18禁)
 ---
-* 小説検索API
+* 検索
   * `/r18/?params`
   * `/r18/word?params`
 
   [なろう18禁小説API - naroujs](https://github.com/59naga/naroujs/blob/master/README.md#%E3%81%AA%E3%82%8D%E3%81%8618%E7%A6%81%E5%B0%8F%E8%AA%ACapi)を参照
 
-* 小説もくじ
+* もくじ
   * `/r18/toc/:ncode`
 
   [`scrapeNarou.tocR18(ncode)` - scrape-narou](https://github.com/59naga/scrape-narou#api)を参照
