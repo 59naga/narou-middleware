@@ -9,7 +9,7 @@
   "dependencies": {
     "express": "^4.13.4",
     "naroujs": "^0.1.0",
-    "scrape-narou": "^0.0.2"
+    "scrape-narou": "^0.1.0"
   },
   "scripts": {
     "start": "mocha --watch",

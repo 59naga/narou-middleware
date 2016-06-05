@@ -14,7 +14,7 @@ describe('narou-middleware', () => {
     const app = express();
     app.use(createNarouMiddleware());
 
-    describe('/ - 一般小説検索API', () => {
+    describe('/ - 検索', () => {
       it('デフォルト20件を返すべき', (done) => {
         request(app)
         .get('/?of=t-nt')
@@ -103,7 +103,7 @@ describe('narou-middleware', () => {
       });
     });
 
-    describe('/novel/ - 一般小説本文', () => {
+    describe('/novel/ - 本文', () => {
       it('ncode=N9669BKの1ページ目の情報を返すべき', (done) => {
         request(app)
         .get('/novel/N9669BK')
@@ -154,9 +154,19 @@ describe('narou-middleware', () => {
         })
         .end(done);
       });
+
+      it('短編はエラーを返すべき', (done) => {
+        request(app)
+        .get('/novel/n1354ck')
+        .expect(403)
+        .expect(({ body }) => {
+          assert(body.error.match(/URLが不正です。/));
+        })
+        .end(done);
+      });
     });
 
-    describe('/shortstory/ - 短編小説', () => {
+    describe('/shortstory/ - 本文（短編）', () => {
       it('n1354ckの本文情報を返すべき', (done) => {
         request(app)
         .get('/shortstory/n1354ck')
@@ -223,7 +233,7 @@ describe('narou-middleware', () => {
     const appR18 = express();
     appR18.use(createR18Middleware());
 
-    describe('/ - 18禁小説検索API', () => {
+    describe('/ - 検索', () => {
       it('デフォルト20件を返すべき', (done) => {
         request(appR18)
         .get('/')
@@ -276,14 +286,14 @@ describe('narou-middleware', () => {
       });
     });
 
-    describe('/toc/ - 18禁小説もくじ', () => {
+    describe('/toc/ - もくじ', () => {
       it('ncode=N9669BKのもくじ情報を返すべき', (done) => {
         request(appR18)
         .get('/toc/n7663ct')
         .expect(200)
         .expect(({ body }) => {
           const { count, author, authorId, title, chapters, episodes } = body;
-          assert(count === 339);
+          assert(count >= 340);
           assert(author === '磯貝武連');
           assert(authorId === 'x8841n');
           assert(title === 'エルフの国の宮廷魔導師になれたので、とりあえず姫様に性的な悪戯をしてみました。');
@@ -304,16 +314,16 @@ describe('narou-middleware', () => {
       });
     });
 
-    describe('/novel/ - 18禁小説本文', () => {
+    describe('/novel/ - 本文', () => {
       it('ncode=n7663ctの1ページ目の情報を返すべき', (done) => {
         request(appR18)
-        .get('/novel/n7663ct')
+        .get('/novel/n7663ct/1')
         .expect(200)
         .expect(({ body }) => {
           const { uri, page, count, author, authorId, title, chapter, subtitle, content, header, footer, ad, next, prev } = body;
           assert(uri === 'http://novel18.syosetu.com/n7663ct/1/');
           assert(page === 1);
-          assert(count === 339);
+          assert(count >= 340);
           assert(author === '磯貝武連');
           assert(authorId === 'x8841n');
           assert(title === 'エルフの国の宮廷魔導師になれたので、とりあえず姫様に性的な悪戯をしてみました。');
@@ -329,14 +339,47 @@ describe('narou-middleware', () => {
         })
         .end(done);
       });
+
+      it('短編はエラーを返すべき', (done) => {
+        request(appR18)
+        .get('/novel/n1354ck')
+        .expect(403)
+        .expect(({ body }) => {
+          assert(body.error.match(/URLが不正です。/));
+        })
+        .end(done);
+      });
     });
 
-    // todo（パッと思い浮かばなかった）
-    xdescribe('/shortstory/ - 18禁小説本文', () => {
-      it('', (done) => {
+    describe('/shortstory/ - 本文（短編）', () => {
+      it('ncode=N6823CHの小説を返すべき', (done) => {
         request(appR18)
-        .get('/shortstory/')
+        .get('/shortstory/N6823CH')
         .expect(200)
+        .expect(({ body }) => {
+          const { uri, author, authorId, series, seriesId, title, content, header, footer, ad } = body;
+          assert(uri === 'http://novel18.syosetu.com/N6823CH/');
+          assert(author === 'きー子');
+          assert(authorId === 'x8570b');
+          assert(series === '');
+          assert(seriesId === '');
+          assert(title === '姫将軍の肖像');
+          assert(content.match(/^「リントブルム辺境伯軍麾下へ/));
+          assert(content.match(/その少女時代の輝きがそこにあった。$/));
+          assert(header === '暗いです。<br>\nエロくないです。');
+          assert(footer === '');
+          assert(ad.match(/webclap.com/));
+        })
+        .end(done);
+      });
+
+      it('長編はエラーを返すべき', (done) => {
+        request(appR18)
+        .get('/shortstory/N9669BK')
+        .expect(403)
+        .expect(({ body }) => {
+          assert(body.error === 'TOC can not extract');
+        })
         .end(done);
       });
     });
